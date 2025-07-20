@@ -13,11 +13,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id       Int     @id @default(autoincrement())
-  email    String  @unique
-  password String
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  role      Role     @default(USER) // ← New field
   createdAt DateTime @default(now())
 }
 
+enum Role {
+  ADMIN
+  SCHOOL_ADMIN
+  FILE_CREATOR
+  USER
+}
