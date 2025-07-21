@@ -4,8 +4,8 @@ import bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 
 async function main() {
-  const email = 'test@example.com';
-  const password = 'Test@1234';
+  const email = 'anik@gmail.com';
+  const password = '123456';
   const role = 'SCHOOL_ADMIN'; // Adjust according to your enum
 
   const hashedPassword = await bcrypt.hash(password, 10);
