@@ -27,3 +27,56 @@ enum Role {
   FILE_CREATOR
   USER
 }
+
+model LandForm {
+  id                 String      @id @default(cuid())
+  bd_form_no         String
+  appendix           String
+  serial_no          String
+  paragraph_no       String
+  office_name        String
+  mouzar_no          String
+  thana              String
+  district           String
+  khatian_no         String
+  reg_holding_no     String
+  total_land_amount  String
+  table_row_1        String
+  table_row_2        String
+  table_row_3        String
+  table_row_4        String
+  table_row_5        String
+  table_row_6        String
+  table_row_7        String
+  total_where        String
+  note               String
+  invoice_no         String
+  date_bangla        String
+  date_english       String
+  createdAt          DateTime    @default(now())
+
+  owners             Owner[]     @relation("LandFormOwners")
+  lands              LandInfo[]  @relation("LandFormLands")
+}
+
+
+model Owner {
+  id         String    @id @default(cuid())
+  name       String
+  share      String
+
+  landForm   LandForm  @relation("LandFormOwners", fields: [landFormId], references: [id])
+  landFormId String
+}
+
+
+model LandInfo {
+  id          String    @id @default(cuid())
+  landClass   String
+  landAmount  String
+  stainNo     String
+
+  landForm    LandForm  @relation("LandFormLands", fields: [landFormId], references: [id])
+  landFormId  String
+}
+

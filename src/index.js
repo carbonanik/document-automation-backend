@@ -2,6 +2,7 @@ import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import authRoutes from './routes/auth.js';
 import cors from 'cors';
+import landFormRoutes from './routes/landForm.js';
 
 const app = express();
 const prisma = new PrismaClient();
@@ -15,7 +16,8 @@ app.use(cors({
 app.use(express.json());
 
 app.use(express.json());
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes); 
+app.use('/api/land-forms', landFormRoutes);
 
 app.listen(process.env.PORT || 3000, () => {
   console.log(`Server running on port ${process.env.PORT}`);
