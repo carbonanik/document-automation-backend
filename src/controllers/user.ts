@@ -1,0 +1,61 @@
+// src/controllers/user.js
+import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcrypt';
+import { Request, Response } from 'express';
+
+
+const prisma = new PrismaClient();
+
+export const getUser = async (req: Request, res: Response) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.userId },
+      select: {
+        id: true,
+        email: true,
+        createdAt: true,
+      },
+    });
+
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
+
+export const createUser = async (req: Request, res: Response) => {
+  const { fullName, email, whatsapp, password } = req.body;
+
+  console.log(req.body);
+
+  if (!email || !password) {
+    return res.status(400).json({ error: "Email and password are required." });
+  }
+
+  try {
+    const existing = await prisma.user.findUnique({ where: { email } });
+    if (existing) {
+      return res.status(409).json({ error: "User already exists with this email." });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await prisma.user.create({
+      data: {
+        fullName,
+        email,
+        whatsApp: whatsapp,
+        password: hashedPassword,
+      },
+    });
+
+    res.status(201).json(user);
+  } catch (error) {
+    console.error("Error creating user:", error);
+    res.status(500).json({ error: "Something went wrong." });
+  }
+}

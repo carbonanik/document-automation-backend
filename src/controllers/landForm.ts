@@ -1,21 +1,29 @@
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
+import { Request, Response } from 'express';
 const prisma = new PrismaClient();
 
 // Create a LandForm with owners and lands
-export const createLandForm = async (req, res) => {
+export const createLandForm = async (req: Request, res: Response) => {
   try {
     const { formData, owners, lands } = req.body;
 
-    const landForm = await prisma.landForm.create({
-      data: {
-        ...formData,
-        owners: {
-          create: owners,
-        },
-        lands: {
-          create: lands,
+    const data: Prisma.LandFormCreateInput = {
+      ...formData,
+      createdBy: {
+        connect: {
+          id: req.user.userId,
         },
       },
+      owners: {
+        create: owners,
+      },
+      lands: {
+        create: lands,
+      },
+    };
+
+    const landForm = await prisma.landForm.create({
+      data: data,
       include: {
         owners: true,
         lands: true,
@@ -30,7 +38,7 @@ export const createLandForm = async (req, res) => {
 };
 
 // Get a LandForm by ID
-export const getLandFormById = async (req, res) => {
+export const getLandFormById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
@@ -51,7 +59,7 @@ export const getLandFormById = async (req, res) => {
 };
 
 // Update a LandForm by ID (not replacing related owners/lands)
-export const updateLandForm = async (req, res) => {
+export const updateLandForm = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { formData } = req.body;
@@ -68,7 +76,7 @@ export const updateLandForm = async (req, res) => {
 };
 
 // Delete a LandForm and its children
-export const deleteLandForm = async (req, res) => {
+export const deleteLandForm = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
@@ -85,7 +93,7 @@ export const deleteLandForm = async (req, res) => {
 };
 
 // Get all LandForms
-export const getAllLandForms = async (req, res) => {
+export const getAllLandForms = async (req: Request, res: Response) => {
   try {
     const forms = await prisma.landForm.findMany({
       include: {

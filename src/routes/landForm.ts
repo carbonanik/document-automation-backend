@@ -5,7 +5,7 @@ import {
   updateLandForm,
   deleteLandForm,
   getAllLandForms,
-} from '../controllers/landForm.js';
+} from '../controllers/landForm';
 
 const router = express.Router();
 

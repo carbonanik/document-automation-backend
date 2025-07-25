@@ -1,8 +1,8 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-import authRoutes from './routes/auth.js';
+import authRoutes from './routes/auth';
 import cors from 'cors';
-import landFormRoutes from './routes/landForm.js';
+import landFormRoutes from './routes/landForm';
 
 const app = express();
 const prisma = new PrismaClient();
