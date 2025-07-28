@@ -72,6 +72,21 @@ export const updateBkashRechargeStatus = async (req: Request, res: Response) => 
       where: { id: Number(id) },
       data: { status },
     });
+    // If status is APPROVED, add amount to user's account
+    if (status === RechargeStatus.APPROVED && recharge.userId) {
+      // Find or create account
+      let account = await prisma.account.findUnique({ where: { userId: recharge.userId } });
+      if (!account) {
+        account = await prisma.account.create({
+          data: { userId: recharge.userId, balance: recharge.amount },
+        });
+      } else {
+        await prisma.account.update({
+          where: { userId: recharge.userId },
+          data: { balance: { increment: recharge.amount } },
+        });
+      }
+    }
     res.json(recharge);
   } catch (error) {
     res.status(400).json({ error: 'Failed to update status', details: error });

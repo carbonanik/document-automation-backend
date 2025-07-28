@@ -24,6 +24,7 @@ model User {
 
   landForms LandForm[] @relation("UserLandForms")
   bkashRecharges BkashRecharge[] @relation("UserBkashRecharges")
+  account     Account?
 }
 
 enum Role {
@@ -104,5 +105,19 @@ enum RechargeStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+model Account {
+  id      Int    @id @default(autoincrement())
+  balance Float  @default(0)
+  userId  Int    @unique
+  user    User   @relation(fields: [userId], references: [id])
+}
+
+model AppSetting {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
 }
 

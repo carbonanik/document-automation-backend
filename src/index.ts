@@ -6,6 +6,7 @@ import landFormRoutes from './routes/landForm';
 import { authenticate } from './middlewares/auth';
 import bkashRechargeRoutes from './routes/bkashRecharge';
 import userRoutes from './routes/user';
+import appSettingRoutes from './routes/appSetting';
 
 const app = express();
 const prisma = new PrismaClient();
@@ -23,6 +24,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/user', authenticate, userRoutes);
 app.use('/api/land-forms', authenticate, landFormRoutes);
 app.use('/api/bkash-recharge', authenticate, bkashRechargeRoutes);
+app.use('/api/app-setting', appSettingRoutes);
 
 app.listen(process.env.PORT || 3000, () => {
   console.log(`Server running on port ${process.env.PORT}`);

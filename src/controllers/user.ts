@@ -82,3 +82,12 @@ export const deleteUser = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Something went wrong." });
   }
 }
+
+export const getAccountBalance = async (req: Request, res: Response) => {
+  try {
+    const account = await prisma.account.findUnique({ where: { userId: req.user.userId } });
+    res.json({ balance: account ? account.balance : 0 });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+};
