@@ -11,7 +11,7 @@ export const getUser = async (req: Request, res: Response) => {
     const user = await prisma.user.findUnique({
       where: { id: req.user.userId },
       omit: {
-        password:true,
+        password: true,
       }
     });
 
@@ -54,6 +54,31 @@ export const createUser = async (req: Request, res: Response) => {
     res.status(201).json(user);
   } catch (error) {
     console.error("Error creating user:", error);
+    res.status(500).json({ error: "Something went wrong." });
+  }
+}
+
+export const getAllUsers = async (req: Request, res: Response) => {
+  try {
+    const users = await prisma.user.findMany({
+      omit: {
+        password: true,
+      }
+    });
+    res.json(users);
+  } catch (error) {
+    console.error("Error getting all users:", error);
+    res.status(500).json({ error: "Something went wrong." });
+  }
+}
+
+export const deleteUser = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    await prisma.user.delete({ where: { id: parseInt(id) } });
+    res.json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting user:", error);
     res.status(500).json({ error: "Something went wrong." });
   }
 }
