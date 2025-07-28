@@ -58,6 +58,27 @@ export const getLandFormById = async (req: Request, res: Response) => {
   }
 };
 
+export const getLandFormByUserId = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user.userId;
+    const landForms = await prisma.landForm.findMany({
+      where: {
+        createdBy: {
+          id: userId,
+        },
+      },
+      include: {
+        owners: true,
+        lands: true,
+      },
+    });
+    res.json(landForms);
+  } catch (error) {
+    console.error(error);
+      res.status(500).json({ error: 'Failed to get LandForm by User ID' });
+  }
+};
+
 // Update a LandForm by ID (not replacing related owners/lands)
 export const updateLandForm = async (req: Request, res: Response) => {
   try {
@@ -80,6 +101,12 @@ export const deleteLandForm = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
+    console.log(id);
+
+    // Check if the LandForm exists first
+    const landForm = await prisma.landForm.findUnique({ where: { id } });
+    if (!landForm) return res.status(404).json({ error: 'LandForm not found' });
+
     // Delete related records manually if cascading is not set
     await prisma.owner.deleteMany({ where: { landFormId: id } });
     await prisma.landInfo.deleteMany({ where: { landFormId: id } });
@@ -88,6 +115,7 @@ export const deleteLandForm = async (req: Request, res: Response) => {
 
     res.json({ message: 'Form deleted successfully' });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: 'Failed to delete LandForm' });
   }
 };

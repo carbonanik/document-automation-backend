@@ -5,6 +5,7 @@ import { Request, Response, NextFunction } from 'express';
 
 export const authenticate = (req: Request, res: Response, next: NextFunction) => {
   const header = req.headers.authorization;
+  // log is header is present
   if (!header || !header.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Authorization header missing or malformed' });
   }
@@ -21,11 +22,4 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
   } catch (err) {
     return res.status(403).json({ error: 'Invalid or expired token' });
   }
-};
-
-export const authenticateAdmin = (req: Request, res: Response, next: NextFunction) => {
-  if (req.user.role !== 'admin') {
-    return res.status(403).json({ error: 'Unauthorized' });
-  }
-  next();
 };

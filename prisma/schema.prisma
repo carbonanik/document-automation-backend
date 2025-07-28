@@ -23,6 +23,7 @@ model User {
   createdAt DateTime @default(now())
 
   landForms LandForm[] @relation("UserLandForms")
+  bkashRecharges BkashRecharge[] @relation("UserBkashRecharges")
 }
 
 enum Role {
@@ -32,27 +33,29 @@ enum Role {
 
 model LandForm {
   id                 String      @id @default(cuid())
-  bd_form_no         String
-  appendix           String
-  serial_no          String
-  paragraph_no       String
-  office_name        String
-  mouzar_no          String
-  thana              String
-  district           String
-  khatian_no         String
-  reg_holding_no     String
-  total_land_amount  String
-  table_row_1        String
-  table_row_2        String
-  table_row_3        String
-  table_row_4        String
-  table_row_5        String
-  table_row_6        String
-  table_row_7        String
-  total_where        String
-  note               String
-  invoice_no         String
+  bd_form_no         String?
+  appendix           String?
+  serial_no          String?
+  paragraph_no       String?
+  office_name        String?
+  mouzar_no          String?
+  thana              String?
+  district           String?
+  khatian_no         String?
+  reg_holding_no     String?
+  total_land_amount  String?
+  table_row_1        String?
+  table_row_2        String?
+  table_row_3        String?
+  table_row_4        String?
+  table_row_5        String?
+  table_row_6        String?
+  table_row_7        String?
+  total_where        String?
+  note               String?
+  invoice_no         String?
+  date_bangla        String?
+  date_english       String?
   createdAt          DateTime    @default(now())
   createdById        Int
   createdBy          User        @relation("UserLandForms", fields: [createdById], references: [id])
@@ -80,5 +83,26 @@ model LandInfo {
 
   landForm    LandForm  @relation("LandFormLands", fields: [landFormId], references: [id])
   landFormId  String
+}
+
+
+model BkashRecharge {
+  id         Int      @id @default(autoincrement())
+  amount     Float
+  trxId      String   @unique
+  status     RechargeStatus @default(PENDING)
+  bkashNo    String   // e.g. "017XXXXXXXX"
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Optional: Link to user who submitted the recharge
+  userId     Int?
+  user       User?    @relation( "UserBkashRecharges", fields: [userId], references: [id])
+}
+
+enum RechargeStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
