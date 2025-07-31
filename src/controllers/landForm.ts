@@ -37,6 +37,53 @@ export const createLandForm = async (req: Request, res: Response) => {
   }
 };
 
+export const payAndCreateForm = async (req: Request, res: Response) => {
+    try {
+    const { formData, owners, lands } = req.body;
+
+    const data: Prisma.LandFormCreateInput = {
+      ...formData,
+      createdBy: {
+        connect: {
+          id: req.user.userId,
+        },
+      },
+      owners: {
+        create: owners,
+      },
+      lands: {
+        create: lands,
+      },
+    };
+    
+    await prisma.account.update(
+      {
+        where: {
+          userId: req.user.userId,
+        },
+        data: {
+          balance: {
+            decrement: 150,
+          },
+        },
+      }
+    );
+
+    const landForm = await prisma.landForm.create({
+      data: data,
+      include: {
+        owners: true,
+        lands: true,
+      },
+    });
+
+    res.status(201).json(landForm);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to create LandForm' });
+  }
+}
+
 // Get a LandForm by ID
 export const getLandFormById = async (req: Request, res: Response) => {
   try {
