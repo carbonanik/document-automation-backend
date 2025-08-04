@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 async function main() {
   const email = 'anik@gmail.com';
   const password = '123456';
-  const role = 'SCHOOL_ADMIN'; // Adjust according to your enum
+  const role = 'ADMIN'; // Changed from SCHOOL_ADMIN to ADMIN
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -21,7 +21,7 @@ async function main() {
 
     console.log('✅ Test user created:', user);
   } catch (err) {
-    console.error('❌ Failed to create user:', err.message);
+    console.error('❌ Failed to create user:', err instanceof Error ? err.message : 'Unknown error');
   } finally {
     await prisma.$disconnect();
   }
