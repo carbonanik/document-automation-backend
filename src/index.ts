@@ -13,7 +13,7 @@ const prisma = new PrismaClient();
 
 // ✅ Enable CORS for frontend origin
 app.use(cors({
-  origin: 'http://localhost:3000', // your Next.js frontend URL
+  origin: '*', // your Next.js frontend URL
   credentials: true,              // if using cookies or authorization headers
 })); 
 
