@@ -8,17 +8,18 @@ import {
   getAllLandForms,
   payAndCreateForm,
 } from '../controllers/landForm';
+import { authenticate } from '../middlewares/auth';
 
 const router = express.Router();
 
-router.post('/', createLandForm);
-router.get('/', getAllLandForms);
+router.post('/', authenticate, createLandForm);
+router.get('/', authenticate, getAllLandForms);
 //
-router.post('/with-pay', payAndCreateForm);
+router.post('/with-pay', authenticate, payAndCreateForm);
 // get by the user take id from auth token 
-router.get('/user', getLandFormByUserId);
+router.get('/user', authenticate, getLandFormByUserId);
 router.get('/:id', getLandFormById);
-router.put('/:id', updateLandForm);
-router.delete('/:id', deleteLandForm);
+router.put('/:id', authenticate, updateLandForm);
+router.delete('/:id', authenticate, deleteLandForm);
 
 export default router;

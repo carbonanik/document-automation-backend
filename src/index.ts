@@ -22,7 +22,7 @@ app.use(express.json());
 app.use(express.json());
 app.use('/api/auth', authRoutes); 
 app.use('/api/user', authenticate, userRoutes);
-app.use('/api/land-forms', authenticate, landFormRoutes);
+app.use('/api/land-forms', landFormRoutes);
 app.use('/api/bkash-recharge', authenticate, bkashRechargeRoutes);
 app.use('/api/app-setting', appSettingRoutes);
 
