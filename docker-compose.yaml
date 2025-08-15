@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: document-backend
+    ports:
+      - "4000:4000"
+    env_file:
+      - .env        # Place your production env file on the VPS
+    restart: always
+    volumes:
+      - ./prisma:/app/prisma  # Optional: for migrations or prisma generate
