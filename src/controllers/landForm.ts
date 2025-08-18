@@ -38,51 +38,59 @@ export const createLandForm = async (req: Request, res: Response) => {
 };
 
 export const payAndCreateForm = async (req: Request, res: Response) => {
-    try {
+  try {
     const { formData, owners, lands } = req.body;
+    const userId = req.user.userId;
+    const fee = 150;
 
-    const data: Prisma.LandFormCreateInput = {
-      ...formData,
-      createdBy: {
-        connect: {
-          id: req.user.userId,
-        },
-      },
-      owners: {
-        create: owners,
-      },
-      lands: {
-        create: lands,
-      },
-    };
-    
-    await prisma.account.update(
-      {
-        where: {
-          userId: req.user.userId,
-        },
-        data: {
-          balance: {
-            decrement: 150,
-          },
-        },
-      }
-    );
-
-    const landForm = await prisma.landForm.create({
-      data: data,
-      include: {
-        owners: true,
-        lands: true,
-      },
+    // 1. Fetch current balance
+    const account = await prisma.account.findUnique({
+      where: { userId },
+      select: { balance: true },
     });
 
-    res.status(201).json(landForm);
+    if (!account) {
+      return res.status(404).json({ error: "Account not found" });
+    }
+
+    // 2. Check balance
+    if (account.balance < fee) {
+      return res.status(400).json({ error: "Insufficient balance" });
+    }
+
+    // 3. Decrement balance and create form inside transaction
+    const result = await prisma.$transaction(async (tx) => {
+      await tx.account.update({
+        where: { userId },
+        data: {
+          balance: { decrement: fee },
+        },
+      });
+
+      const landForm = await tx.landForm.create({
+        data: {
+          ...formData,
+          createdBy: {
+            connect: { id: userId },
+          },
+          owners: { create: owners },
+          lands: { create: lands },
+        },
+        include: {
+          owners: true,
+          lands: true,
+        },
+      });
+
+      return landForm;
+    });
+
+    res.status(201).json(result);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Failed to create LandForm' });
+    res.status(500).json({ error: "Failed to create LandForm" });
   }
-}
+};
 
 // Get a LandForm by ID
 export const getLandFormById = async (req: Request, res: Response) => {
@@ -122,7 +130,7 @@ export const getLandFormByUserId = async (req: Request, res: Response) => {
     res.json(landForms);
   } catch (error) {
     console.error(error);
-      res.status(500).json({ error: 'Failed to get LandForm by User ID' });
+    res.status(500).json({ error: 'Failed to get LandForm by User ID' });
   }
 };
 
