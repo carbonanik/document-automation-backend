@@ -64,6 +64,13 @@ export const getAllUsers = async (req: Request, res: Response) => {
     const users = await prisma.user.findMany({
       omit: {
         password: true,
+      },
+      include: {
+        account: {
+          select: {
+            balance: true,
+          },
+        }
       }
     });
     res.json(users);
@@ -76,8 +83,14 @@ export const getAllUsers = async (req: Request, res: Response) => {
 export const deleteUser = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    await prisma.user.delete({ where: { id: parseInt(id) } });
+    await prisma.$transaction(async (tx) => {
+      await prisma.landForm.deleteMany({ where: { createdBy: { id: parseInt(id) } } });
+      await prisma.account.delete({ where: { userId: parseInt(id) } });
+      await prisma.bkashRecharge.deleteMany({ where: { userId: parseInt(id) } });
+      await prisma.user.delete({ where: { id: parseInt(id) } });
+    });
     res.json({ message: "User deleted successfully" });
+
   } catch (error) {
     console.error("Error deleting user:", error);
     res.status(500).json({ error: "Something went wrong." });

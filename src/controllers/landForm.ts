@@ -41,7 +41,19 @@ export const payAndCreateForm = async (req: Request, res: Response) => {
   try {
     const { formData, owners, lands } = req.body;
     const userId = req.user.userId;
-    const fee = 150;
+
+    // get user 
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId
+      }
+    });
+
+    let fee = 150;
+
+    if (user?.price != null && user?.price != undefined) {
+      fee = user!.price;
+    }
 
     // 1. Fetch current balance
     const account = await prisma.account.findUnique({
