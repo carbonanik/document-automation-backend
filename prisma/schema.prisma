@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,104 +8,85 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  fullName  String?
-  whatsApp  String?
-  email     String   @unique
-  password  String
-  role      Role     @default(USER) // ← New field
-  createdAt DateTime @default(now())
-
-  landForms LandForm[] @relation("UserLandForms")
+  id             Int             @id @default(autoincrement())
+  fullName       String?
+  whatsApp       String?
+  email          String          @unique
+  password       String
+  price          Float           @default(150)
+  role           Role            @default(USER)
+  createdAt      DateTime        @default(now())
+  account        Account?
   bkashRecharges BkashRecharge[] @relation("UserBkashRecharges")
-  account     Account?
-}
-
-enum Role {
-  ADMIN
-  USER
+  landForms      LandForm[]      @relation("UserLandForms")
 }
 
 model LandForm {
-  id                 String      @id @default(cuid())
-  bd_form_no         String?
-  appendix           String?
-  serial_no          String?
-  paragraph_no       String?
-  office_name        String?
-  mouzar_no          String?
-  thana              String?
-  district           String?
-  khatian_no         String?
-  reg_holding_no     String?
-  total_land_amount  String?
-  table_row_1        String?
-  table_row_2        String?
-  table_row_3        String?
-  table_row_4        String?
-  table_row_5        String?
-  table_row_6        String?
-  table_row_7        String?
-  total_where        String?
-  note               String?
-  invoice_no         String?
-  date_bangla        String?
-  date_english       String?
-  createdAt          DateTime    @default(now())
-  createdById        Int
-  createdBy          User        @relation("UserLandForms", fields: [createdById], references: [id])
-
-  owners             Owner[]     @relation("LandFormOwners")
-  lands              LandInfo[]  @relation("LandFormLands")
+  id                String     @id @default(cuid())
+  bd_form_no        String?
+  appendix          String?
+  serial_no         String?
+  paragraph_no      String?
+  office_name       String?
+  mouzar_no         String?
+  thana             String?
+  district          String?
+  khatian_no        String?
+  reg_holding_no    String?
+  total_land_amount String?
+  table_row_1       String?
+  table_row_2       String?
+  table_row_3       String?
+  table_row_4       String?
+  table_row_5       String?
+  table_row_6       String?
+  table_row_7       String?
+  total_where       String?
+  note              String?
+  invoice_no        String?
+  date_bangla       String?
+  date_english      String?
+  createdAt         DateTime   @default(now())
+  createdById       Int
+  createdBy         User       @relation("UserLandForms", fields: [createdById], references: [id])
+  lands             LandInfo[] @relation("LandFormLands")
+  owners            Owner[]    @relation("LandFormOwners")
 }
-
 
 model Owner {
-  id         String    @id @default(cuid())
+  id         String   @id @default(cuid())
   name       String
   share      String
-
-  landForm   LandForm  @relation("LandFormOwners", fields: [landFormId], references: [id])
   landFormId String
+  landForm   LandForm @relation("LandFormOwners", fields: [landFormId], references: [id])
 }
-
 
 model LandInfo {
-  id          String    @id @default(cuid())
-  landClass   String
-  landAmount  String
-  stainNo     String
-
-  landForm    LandForm  @relation("LandFormLands", fields: [landFormId], references: [id])
-  landFormId  String
+  id         String   @id @default(cuid())
+  landClass  String
+  landAmount String
+  stainNo    String
+  landFormId String
+  landForm   LandForm @relation("LandFormLands", fields: [landFormId], references: [id])
 }
-
 
 model BkashRecharge {
-  id         Int      @id @default(autoincrement())
-  amount     Float
-  trxId      String   @unique
-  status     RechargeStatus @default(PENDING)
-  bkashNo    String   // e.g. "017XXXXXXXX"
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  // Optional: Link to user who submitted the recharge
-  userId     Int?
-  user       User?    @relation( "UserBkashRecharges", fields: [userId], references: [id])
-}
-
-enum RechargeStatus {
-  PENDING
-  APPROVED
-  REJECTED
+  id        Int            @id @default(autoincrement())
+  amount    Float
+  trxId     String         @unique
+  status    RechargeStatus @default(PENDING)
+  bkashNo   String
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  userId    Int?
+  user      User?          @relation("UserBkashRecharges", fields: [userId], references: [id])
 }
 
 model Account {
-  id      Int    @id @default(autoincrement())
-  balance Float  @default(0)
-  userId  Int    @unique
-  user    User   @relation(fields: [userId], references: [id])
+  id      Int   @id @default(autoincrement())
+  balance Float @default(0)
+  userId  Int   @unique
+  user    User  @relation(fields: [userId], references: [id])
 }
 
 model AppSetting {
@@ -121,3 +96,13 @@ model AppSetting {
   updatedAt DateTime @updatedAt
 }
 
+enum Role {
+  ADMIN
+  USER
+}
+
+enum RechargeStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}

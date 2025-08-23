@@ -26,7 +26,7 @@ export const getUser = async (req: Request, res: Response) => {
 
 
 export const createUser = async (req: Request, res: Response) => {
-  const { fullName, email, whatsapp, password } = req.body;
+  const { fullName, email, whatsapp, password, price } = req.body;
 
   console.log(req.body);
 
@@ -48,6 +48,7 @@ export const createUser = async (req: Request, res: Response) => {
         email,
         whatsApp: whatsapp,
         password: hashedPassword,
+        price: parseFloat(price) || 0,
       },
     });
 
