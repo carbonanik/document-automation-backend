@@ -85,7 +85,7 @@ export const deleteUser = async (req: Request, res: Response) => {
   try {
     await prisma.$transaction(async (tx) => {
       await prisma.landForm.deleteMany({ where: { createdBy: { id: parseInt(id) } } });
-      await prisma.account.delete({ where: { userId: parseInt(id) } });
+      await prisma.account.deleteMany({ where: { userId: parseInt(id) } });
       await prisma.bkashRecharge.deleteMany({ where: { userId: parseInt(id) } });
       await prisma.user.delete({ where: { id: parseInt(id) } });
     });

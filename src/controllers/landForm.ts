@@ -62,7 +62,7 @@ export const payAndCreateForm = async (req: Request, res: Response) => {
     });
 
     if (!account) {
-      return res.status(404).json({ error: "Account not found" });
+      return res.status(404).json({ error: "Insufficient balance" });
     }
 
     // 2. Check balance
@@ -165,6 +165,7 @@ export const updateLandForm = async (req: Request, res: Response) => {
 
 export const payAndUpdateLandForm = async (req: Request, res: Response) => {
   try {
+    const { id } = req.params;
     const { formData, owners, lands } = req.body;
     const userId = req.user.userId;
 
@@ -188,7 +189,7 @@ export const payAndUpdateLandForm = async (req: Request, res: Response) => {
     });
 
     if (!account) {
-      return res.status(404).json({ error: "Account not found" });
+      return res.status(404).json({ error: "Insufficient balance" });
     }
 
     // 2. Check balance
@@ -207,7 +208,7 @@ export const payAndUpdateLandForm = async (req: Request, res: Response) => {
       });
 
       const landForm = await tx.landForm.update({
-        where: { id: formData.id },
+        where: { id: id },
         data: {
           ...formData,
           owners: { set: owners },
