@@ -5,8 +5,17 @@ const prisma = new PrismaClient();
 
 // Create
 export const createBkashRecharge = async (req: Request, res: Response) => {
-  try { 
+  try {
     const { amount, trxId, bkashNo } = req.body;
+
+    const existingRecharge = await prisma.bkashRecharge.findUnique({
+      where: { trxId }
+    });
+    
+    if (existingRecharge) {
+      return res.status(400).json({ error: 'Invalid transaction ID', message: 'This transaction ID has already been used' });
+    }
+
     const recharge = await prisma.bkashRecharge.create({
       data: { amount, trxId, bkashNo, userId: req.user.userId },
     });

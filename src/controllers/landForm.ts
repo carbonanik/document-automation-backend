@@ -163,6 +163,72 @@ export const updateLandForm = async (req: Request, res: Response) => {
   }
 };
 
+export const payAndUpdateLandForm = async (req: Request, res: Response) => {
+  try {
+    const { formData, owners, lands } = req.body;
+    const userId = req.user.userId;
+
+    // get user 
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId
+      }
+    });
+
+    let fee = 150;
+
+    if (user?.price != null && user?.price != undefined) {
+      fee = user!.price;
+    }
+
+    // 1. Fetch current balance
+    const account = await prisma.account.findUnique({
+      where: { userId },
+      select: { balance: true },
+    });
+
+    if (!account) {
+      return res.status(404).json({ error: "Account not found" });
+    }
+
+    // 2. Check balance
+    if (account.balance < fee) {
+      return res.status(400).json({ error: "Insufficient balance" });
+    }
+
+    // 3. Decrement balance and update form inside transaction
+
+    const result = await prisma.$transaction(async (tx) => {
+      await tx.account.update({
+        where: { userId },
+        data: {
+          balance: { decrement: fee },
+        },
+      });
+
+      const landForm = await tx.landForm.update({
+        where: { id: formData.id },
+        data: {
+          ...formData,
+          owners: { set: owners },
+          lands: { set: lands },
+        },
+        include: {
+          owners: true,
+          lands: true,
+        },
+      });
+
+      return landForm;
+    });
+
+    res.status(201).json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to update LandForm" });
+  }
+}
+
 // Delete a LandForm and its children
 export const deleteLandForm = async (req: Request, res: Response) => {
   try {

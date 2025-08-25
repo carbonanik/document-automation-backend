@@ -7,6 +7,7 @@ import {
   deleteLandForm,
   getAllLandForms,
   payAndCreateForm,
+  payAndUpdateLandForm,
 } from '../controllers/landForm';
 import { authenticate } from '../middlewares/auth';
 
@@ -20,6 +21,7 @@ router.post('/with-pay', authenticate, payAndCreateForm);
 router.get('/user', authenticate, getLandFormByUserId);
 router.get('/:id', getLandFormById);
 router.put('/:id', authenticate, updateLandForm);
+router.put('/with-pay/:id', authenticate, payAndUpdateLandForm);
 router.delete('/:id', authenticate, deleteLandForm);
 
 export default router;
